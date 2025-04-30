@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Item - Lookup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Report Lost or Found Item</h1>
+    <form id="reportForm">
+        <input type="text" id="name" placeholder="Item Name" required><br>
+        <textarea id="description" placeholder="Description" required></textarea><br>
+        <select id="status">
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+        </select><br>
+        <input type="file" id="image"><br>
+        <button type="submit">Submit</button>
+    </form>
+    <a href="index.html">Back to Home</a>
+    <script>
+    document.getElementById('reportForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const status = document.getElementById('status').value;
+        const imageInput = document.getElementById('image');
+        let imageData = '';
+
+        if (imageInput.files.length > 0) {
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                imageData = e.target.result;
+
+                const item = { name, description, status, image: imageData };
+                await fetch('https://lookup-backend.onrender.com/api/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item)
+                });
+                alert('Item submitted!');
+                window.location.href = 'index.html';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            const item = { name, description, status, image: '' };
+            await fetch('https://lookup-backend.onrender.com/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item)
+            });
+            alert('Item submitted!');
+            window.location.href = 'index.html';
+        }
+    });
+    </script>
+</body>
+</html>
